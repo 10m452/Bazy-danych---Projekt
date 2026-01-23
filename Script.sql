@@ -158,3 +158,41 @@ BEGIN
 	END LOOP;
 END;
 $$ language 'plpgsql';
+
+
+create view top_10 as
+	select m.title, m.release_date, m.time, r.average_rating
+	from movies m 
+	join  (select movie_id, avg(rating)::DECIMAL(4,2) as average_rating 
+			from actions natural join ratings
+			group by movie_id) r using (movie_id)
+	order by r.average_rating desc
+	limit 10;
+
+create or replace function rate(
+	m_id INTEGER, u_id INTEGER, 
+	rating_v DECIMAL, review_v TEXT
+	) returns VOID AS $$
+DECLARE
+	a_id INTEGER;
+BEGIN
+	INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id,'rate')
+	RETURNING action_id INTO a_id;
+	INSERT INTO ratings(action_id,rating,review) VALUES(a_id,rating_v,review_v);
+END;
+$$ language 'plpgsql';
+
+
+create or replace function add_to_list(
+	m_id INTEGER, u_id INTEGER, 
+	l_name TEXT
+	) returns VOID AS $$
+DECLARE
+	a_id INTEGER;
+BEGIN
+	INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id,'list')
+	RETURNING action_id INTO a_id;
+	INSERT INTO watchlists(action_id,list_name) VALUES(a_id,l_name);
+END;
+$$ language 'plpgsql';
+
