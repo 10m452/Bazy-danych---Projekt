@@ -51,6 +51,10 @@ create table watchlists(
 	list_name		TEXT
 );
 
+
+
+
+
 create or replace function movie_cast(t INTEGER) returns setof TEXT as $$
 BEGIN
 	RETURN QUERY
@@ -111,24 +115,46 @@ END;
 $$ language 'plpgsql';
 
 
-create or replace function add_pm(movie_id INTEGER, actor TEXT, position TEXT) returns VOID AS $$
+create or replace function add_pm(
+	movie_id INTEGER, 
+	actor TEXT, 
+	position TEXT
+) returns VOID AS $$
 DECLARE
 	p_id INTEGER;
 BEGIN
-	INSERT INTO people VALUES (actor) ON CONFLICT (name) DO NOTHING;
+	INSERT INTO people (name) VALUES (actor) ON CONFLICT (name) DO NOTHING;
 	SELECT person_id INTO p_id FROM people WHERE name = actor;
 	INSERT INTO people_movies VALUES (p_id, movie_id, position);
 END;
 $$ language 'plpgsql';
 
-create or replace function add_movie(title TEXT, 
-create or replace function get_id_movie RETURNS TRIGGER AS $$
+create or replace function add_movie(
+	title TEXT, release_date DATE, 
+	time INTEGER, description TEXT, 
+	actors TEXT[], directors TEXT[],
+	country_l TEXT[], genre_l TEXT[]
+	) returns VOID as $$
+DECLARE
+	m_id INTEGER;
+	director TEXT;
+	actor TEXT;
+	country TEXT;
+	genre TEXT;
 BEGIN
-	
+	INSERT INTO movies VALUES (title,release_date,time,description)
+	RETURNING movie_id INTO m_id;
+	FOREACH director IN ARRAY directors LOOP
+		PERFORM add_pm(m_id, director, 'Director');
+	END LOOP;
+	FOREACH actor IN ARRAY actors LOOP
+		PERFORM add_pm(m_id, actor, 'Actor');
+	END LOOP;
+	FOREACH country IN ARRAY country_l LOOP
+		INSERT INTO countries VALUES (m_id, country);
+	END LOOP;
+	FOREACH genre IN ARRAY genre_l LOOP
+		INSERT INTO genres VALUES (m_id, genre);
+	END LOOP;
 END;
 $$ language 'plpgsql';
-
-DROP TRIGGER get_id_movie ON movies CASCADE;
-CREATE TRIGGER get_id_movie AFTER INSERT ON movies
-		
-
