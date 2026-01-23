@@ -1,7 +1,7 @@
 
 import tkinter as tk
-from views import LoginFrame, MainFrame, AdminFrame
-from controllers import Login, Main, Admin
+from views import LoginFrame, MainFrame, AdminFrame, MovieView
+from controllers import Login, Main, Admin, Movie
 
 class App(tk.Tk):
     def __init__(self):
@@ -19,10 +19,16 @@ class App(tk.Tk):
         self.view.pack(expand=True, fill="both")
         Main(self.view, self)
 
+    def show_movie_view(self, movie_id):
+        if hasattr(self,'view') and self.view:
+            self.view.destroy()
+        self.view = MovieView(self)
+        self.view.pack(expand=True, fill="both")
+        Movie(self.view, self, movie_id)
+
     def show_admin_view(self):
         if hasattr(self,'view') and self.view:
             self.view.destroy()
-
         self.view = AdminFrame(self)
         self.view.pack(expand=True, fill="both")
         Admin(self.view,self)
