@@ -125,7 +125,7 @@ DECLARE
 BEGIN
 	INSERT INTO people (name) VALUES (actor) ON CONFLICT (name) DO NOTHING;
 	SELECT person_id INTO p_id FROM people WHERE name = actor;
-	INSERT INTO people_movies VALUES (p_id, movie_id, role);
+	INSERT INTO people_movies VALUES (movie_id, p_id, role);
 END;
 $$ language 'plpgsql';
 
