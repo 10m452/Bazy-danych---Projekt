@@ -85,7 +85,7 @@ END;
 $$ language 'plpgsql';
 
 
-create or replace function director_movies(t TEXT) returns setof TEXT as $$
+create or replace function director_movies(t TEXT) returns TABLE(m_id INTEGER, m_title TEXT, m_year DATE) as $$
 BEGIN
 	RETURN QUERY
 	select m.movie_id, m.title, m.release_date
@@ -95,7 +95,7 @@ END;
 $$ language 'plpgsql';
 
 
-create or replace function movies_from(t TEXT) returns setof TEXT as $$
+create or replace function movies_from(t TEXT) returns TABLE(m_id INTEGER, m_title TEXT, m_year DATE) as $$
 BEGIN
 	RETURN QUERY
 	select m.movie_id, m.title, m.release_date
@@ -105,7 +105,7 @@ END;
 $$ language 'plpgsql';
 
 
-create or replace function genre_movies(t TEXT) returns setof TEXT as $$
+create or replace function genre_movies(t TEXT) returns TABLE(m_id INTEGER, m_title TEXT, m_year DATE) as $$
 BEGIN
 	RETURN QUERY
 	select m.movie_id, m.title, m.release_date
@@ -229,4 +229,5 @@ begin
 	where user_id = u_id and movie_id = m_id and type = 'watched';
 end;
 $$ language 'plpgsql';
+
 
