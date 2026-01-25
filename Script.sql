@@ -88,7 +88,7 @@ $$ language 'plpgsql';
 create or replace function director_movies(t TEXT) returns setof TEXT as $$
 BEGIN
 	RETURN QUERY
-	select m.title
+	select m.movie_id, m.title, m.release_date
 	from people p natural join people_movies pm natural join movies m
 	where p.name ILIKE t AND pm.role LIKE 'Director';
 END;
@@ -98,7 +98,7 @@ $$ language 'plpgsql';
 create or replace function movies_from(t TEXT) returns setof TEXT as $$
 BEGIN
 	RETURN QUERY
-	select m.title
+	select m.movie_id, m.title, m.release_date
 	from countries c natural join movies m
 	where c.country ILIKE t;
 END;
@@ -108,7 +108,7 @@ $$ language 'plpgsql';
 create or replace function genre_movies(t TEXT) returns setof TEXT as $$
 BEGIN
 	RETURN QUERY
-	select m.title
+	select m.movie_id, m.title, m.release_date
 	from genres g natural join movies m
 	where g.genre ILIKE t;
 END;
@@ -229,3 +229,4 @@ begin
 	where user_id = u_id and movie_id = m_id and type = 'watched';
 end;
 $$ language 'plpgsql';
+
