@@ -246,61 +246,63 @@ $$ language 'plpgsql';
 
 
 create or replace function show_watched(u_id INTEGER)
-RETURNS TABLE (movie_id INT)
+RETURNS TABLE (movie_id INT, title TEXT, release_date DATE)
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT a.movie_id
-    FROM actions a
+    SELECT a.movie_id, m.title, m.release_date
+    FROM actions a JOIN movies m USING (movie_id)
     WHERE a.user_id = u_id
       AND a.type = 'watched';
 END;
 $$ LANGUAGE plpgsql;
 
 
+
 create or replace function show_user_reviews(u_id INTEGER)
-RETURNS TABLE (movie_id INT, rating INT, review TEXT)
+RETURNS TABLE (movie_id INT, title TEXT, rating INT, review TEXT)
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT a.movie_id, r.rating, r.review
-    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    SELECT a.movie_id, m.title, r.rating, r.review
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id JOIN movies m ON a.movie_id = m.movie_id
     WHERE a.user_id = u_id;
 END;
 $$ LANGUAGE plpgsql;
 
 
+
 create or replace function show_user_ratings(u_id INTEGER)
-RETURNS TABLE (movie_id INT, rating INT)
+RETURNS TABLE (movie_id INT, title TEXT, rating INT)
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT a.movie_id, r.rating
-    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    SELECT a.movie_id, m.title, r.rating
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id JOIN movies m ON a.movie_id = m.movie_id
     WHERE a.user_id = u_id;
 END;
 $$ LANGUAGE plpgsql;
 
 
 create or replace function show_movie_reviews(m_id INTEGER)
-RETURNS TABLE (user_id INT, rating INT, review TEXT)
+RETURNS TABLE (user_id INT, user_nick TEXT, rating INT, review TEXT)
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT a.user_id, r.rating, r.review
-    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    SELECT a.user_id, u.nick, r.rating, r.review
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id JOIN users u ON a.user_id = u.user_id
     WHERE a.movie_id = m_id;
 END;
 $$ LANGUAGE plpgsql;
 
 
 create or replace function show_movie_ratings(m_id INTEGER)
-RETURNS TABLE (user_id INT, rating INT)
+RETURNS TABLE (user_id INT, user_nick TEXT, rating INT)
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT a.user_id, r.rating
-    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    SELECT a.user_id, u.nick, r.rating
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id JOIN users u ON a.user_id = u.user_id
     WHERE a.movie_id = m_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -365,6 +367,7 @@ CREATE TRIGGER trigger_prevent_duplicate_watched_film
 BEFORE INSERT ON actions
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_watched_film();
+
 
 
 
