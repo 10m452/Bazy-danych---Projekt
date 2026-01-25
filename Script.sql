@@ -168,6 +168,16 @@ create view top_10 as
 	order by r.average_rating desc
 	limit 10;
 
+
+create or replace function mark_as_watched(
+	m_id INTEGER, u_id INTEGER
+	) returns VOID AS $$
+BEGIN
+	INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id,'watched');
+END;
+$$ language 'plpgsql';
+
+
 create or replace function rate(
 	m_id INTEGER, u_id INTEGER, 
 	rating_v DECIMAL, review_v TEXT
@@ -175,9 +185,12 @@ create or replace function rate(
 DECLARE
 	a_id INTEGER;
 BEGIN
-	INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id,'rate')
+	INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id, 'rate')
 	RETURNING action_id INTO a_id;
 	INSERT INTO ratings(action_id,rating,review) VALUES(a_id,rating_v,review_v);
+	IF NOT EXISTS (SELECT 1 FROM actions WHERE movie_id = m_id AND user_id = u_id AND type = 'watched') THEN
+		INSERT INTO actions (movie_id, user_id, type) VALUES (m_id, u_id, 'watched');
+	END IF;	
 END;
 $$ language 'plpgsql';
 
@@ -229,6 +242,120 @@ begin
 	where user_id = u_id and movie_id = m_id and type = 'watched';
 end;
 $$ language 'plpgsql';
+
+
+
+create or replace function show_watched(u_id INTEGER)
+RETURNS TABLE (movie_id INT)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT a.movie_id
+    FROM actions a
+    WHERE a.user_id = u_id
+      AND a.type = 'watched';
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function show_user_reviews(u_id INTEGER)
+RETURNS TABLE (movie_id INT, rating INT, review TEXT)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT a.movie_id, r.rating, r.review
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    WHERE a.user_id = u_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function show_user_ratings(u_id INTEGER)
+RETURNS TABLE (movie_id INT, rating INT)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT a.movie_id, r.rating
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    WHERE a.user_id = u_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function show_movie_reviews(m_id INTEGER)
+RETURNS TABLE (user_id INT, rating INT, review TEXT)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT a.user_id, r.rating, r.review
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    WHERE a.movie_id = m_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+create or replace function show_movie_ratings(m_id INTEGER)
+RETURNS TABLE (user_id INT, rating INT)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT a.user_id, r.rating
+    FROM actions a JOIN ratings r ON a.action_id = r.action_id
+    WHERE a.movie_id = m_id;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION prevent_duplicate_film_in_database()
+RETURNS trigger AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM movies
+        WHERE title = NEW.title
+          AND release_date = NEW.release_date
+    ) THEN
+        RAISE EXCEPTION
+            'Film "%" już istnieje w bazie',
+            NEW.title;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_prevent_duplicate_film_in_database
+BEFORE INSERT ON movies
+FOR EACH ROW
+EXECUTE FUNCTION prevent_duplicate_film_in_database();
+
+
+
+CREATE OR REPLACE FUNCTION prevent_duplicate_watched_film()
+RETURNS trigger AS $$
+BEGIN
+    IF  NEW.type = 'watched'
+	AND EXISTS (
+        	SELECT 1
+        	FROM actions 
+		WHERE movie_id = NEW.movie_id 
+		AND user_id = NEW.user_id
+		AND type = 'watched'
+    ) THEN
+        RAISE EXCEPTION
+            'Ten film już jest oznaczony jako obejrzany';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_prevent_duplicate_watched_film
+BEFORE INSERT ON actions
+FOR EACH ROW
+EXECUTE FUNCTION prevent_duplicate_watched_film();
+
 
 
 
