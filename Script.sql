@@ -306,6 +306,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION movie_avg(m_id INTEGER) RETURNS DECIMAL AS $$
+DECLARE
+	avg_score DECIMAL(4, 2);
+BEGIN
+	SELECT avg(rating)::DECIMAL(4,2) INTO avg_score FROM actions JOIN ratings USING (action_id)
+	WHERE movie_id = m_id;
+	RETURN avg_score;
+END;
+$$ LANGUAGE 'plpgsql';
+
 
 CREATE OR REPLACE FUNCTION prevent_duplicate_film_in_database()
 RETURNS trigger AS $$
@@ -355,7 +365,6 @@ CREATE TRIGGER trigger_prevent_duplicate_watched_film
 BEFORE INSERT ON actions
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_watched_film();
-
 
 
 
