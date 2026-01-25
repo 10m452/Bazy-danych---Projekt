@@ -65,10 +65,10 @@ END;
 $$ language 'plpgsql';
 
 
-create or replace function actor_movies(t TEXT) returns setof TEXT as $$
+create or replace function actor_movies(t TEXT) returns TABLE(m_id INTEGER, m_title TEXT, m_year DATE) as $$
 BEGIN
 	RETURN QUERY
-	select m.title
+	select m.movie_id, m.title, m.release_date
 	from people p natural join people_movies pm natural join movies m
 	where p.name ILIKE t AND pm.role LIKE 'Actor';
 END;
@@ -229,5 +229,6 @@ begin
 	where user_id = u_id and movie_id = m_id and type = 'watched';
 end;
 $$ language 'plpgsql';
+
 
 
