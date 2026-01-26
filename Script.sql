@@ -226,12 +226,31 @@ begin
 end;
 $$ language 'plpgsql';
 
+CREATE OR REPLACE FUNCTION delete_rating(u_id INTEGER, m_id INTEGER) RETURNS TEXT AS $$
+DECLARE
+movie_database$# a_id INTEGER;
+movie_database$# BEGIN
+movie_database$#             SELECT action_id INTO a_id FROM actions NATURAL JOIN ratings WHERE user_id=u_id and movie_id=m_id;
+movie_database$#             IF a_id IS NOT NULL THEN
+movie_database$# DELETE FROM ratings WHERE action_id = a_id;
+movie_database$# DELETE FROM actions WHERE action_id = a_id;
+movie_database$# RETURN 'Review deleted';
+movie_database$# ELSE
+movie_database$# RETURN 'Review not found';
+movie_database$# END IF;
+movie_database$# END;
+movie_database$# $$ LANGUAGE plpgsql;
+
 create or replace function delete_rating(u_id INTEGER, m_id INTEGER) returns TEXT as $$
 begin
-	delete from actions
-	where user_id = u_id and movie_id = m_id 
-	and action_id in (SELECT action_id FROM ratings);
-	return 'Usunięto ocenę filmu';
+	select action_id into a_id from actions natural join ratings where user_id = u_id and movie_id = m_id;
+	if a_id is not null then
+		delete from ratings where action_id = a_id;
+		delete from actions where action_id = a_id;
+		return 'Review deleted';
+	else
+		return 'Review not found';
+	end if;
 end;
 $$ language 'plpgsql';
 
@@ -367,6 +386,7 @@ CREATE TRIGGER trigger_prevent_duplicate_watched_film
 BEFORE INSERT ON actions
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_watched_film();
+
 
 
 
