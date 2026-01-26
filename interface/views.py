@@ -21,7 +21,7 @@ class LoginFrame(tk.Frame):
 
         pswrd = tk.Label(self, text = "Please enter your password: ")
         pswrd.pack()
-        self.pswrd_entr= tk.Entry(self, width = 50)
+        self.pswrd_entr= tk.Entry(self, width = 50, show="*")
         self.pswrd_entr.pack()
 
         self.login_btn = tk.Button(self, text="Login")
@@ -369,4 +369,5 @@ class WatchlistFrame(tk.Toplevel):
                 messagebox.showinfo("Success", "Movie removed from your list")
             except Exception as e:
                 messagebox.showerror("Error", f"Something went wrong... {e}")
+
 
