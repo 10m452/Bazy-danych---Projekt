@@ -228,18 +228,18 @@ $$ language 'plpgsql';
 
 CREATE OR REPLACE FUNCTION delete_rating(u_id INTEGER, m_id INTEGER) RETURNS TEXT AS $$
 DECLARE
-movie_database$# a_id INTEGER;
-movie_database$# BEGIN
-movie_database$#             SELECT action_id INTO a_id FROM actions NATURAL JOIN ratings WHERE user_id=u_id and movie_id=m_id;
-movie_database$#             IF a_id IS NOT NULL THEN
-movie_database$# DELETE FROM ratings WHERE action_id = a_id;
-movie_database$# DELETE FROM actions WHERE action_id = a_id;
-movie_database$# RETURN 'Review deleted';
-movie_database$# ELSE
-movie_database$# RETURN 'Review not found';
-movie_database$# END IF;
-movie_database$# END;
-movie_database$# $$ LANGUAGE plpgsql;
+	a_id INTEGER;
+BEGIN
+	SELECT action_id INTO a_id FROM actions NATURAL JOIN ratings WHERE user_id=u_id and movie_id=m_id;
+    IF a_id IS NOT NULL THEN
+	DELETE FROM ratings WHERE action_id = a_id;
+	DELETE FROM actions WHERE action_id = a_id;
+	RETURN 'Review deleted';
+	ELSE
+	RETURN 'Review not found';
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 create or replace function delete_rating(u_id INTEGER, m_id INTEGER) returns TEXT as $$
 begin
@@ -386,6 +386,7 @@ CREATE TRIGGER trigger_prevent_duplicate_watched_film
 BEFORE INSERT ON actions
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_watched_film();
+
 
 
 
