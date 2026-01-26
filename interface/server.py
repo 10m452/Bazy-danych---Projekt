@@ -5,10 +5,9 @@ def get_conn():
 
 DB_CONFIG = {
     "host" : "localhost",
-    "database" : "postgres",
-    "user" : "postgres",
+    "database" : "***",
+    "user" : "***",
     "password" : "***",
     "port": 5432
 }
-
 

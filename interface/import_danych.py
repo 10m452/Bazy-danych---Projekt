@@ -1,13 +1,15 @@
 import csv
 import psycopg2
 
+
+
 # połączenie z bazą
 conn = psycopg2.connect(
     host="localhost",
     port=5432,
-    database="postgres", # baza
-    user="postgres",
-    password="Natalka" # haslo
+    database="***", # baza
+    user="***",
+    password="***" # haslo
 )
 
 cur = conn.cursor()
@@ -21,16 +23,14 @@ with open("movies_data.csv", encoding="cp1250") as f:
         # Zamiana 'NA' na None
         row = [None if (x == 'NA' or x == '') else x for x in row]
         cur.execute(
-            "INSERT INTO movies (title, release_date, time, description) VALUES (%s, %s, %s, %s)",
-            row[1:5]  # upewnij się, że bierzesz tylko tyle kolumn, ile jest w tabeli
+            "INSERT INTO movies (movie_id, title, release_date, runtime, description) VALUES (%s, %s, %s, %s, %s)",
+            row[:5]
         )
 
 conn.commit()
-cur.close()
-conn.close()
 
 # import do tabeli people
-with open("people_data.csv", encoding="cp1250") as f:
+with open("people_data", encoding="cp1250") as f:
 
     reader = csv.reader(f)
     next(reader)
@@ -76,7 +76,7 @@ conn.commit()
 
 
 # import do tabeli people_movies (aktorzy)
-with open("movies_actors_data.csv", encoding="cp1250") as f:
+with open("movies_actors_data", encoding="cp1250") as f:
 
     reader = csv.reader(f)
     next(reader)
@@ -91,7 +91,7 @@ with open("movies_actors_data.csv", encoding="cp1250") as f:
 conn.commit()
 
 # import do tabeli people_movies (tworcy)
-with open("movies_crew_data.csv", encoding="cp1250") as f:
+with open("movies_crew_data", encoding="cp1250") as f:
 
     reader = csv.reader(f)
     next(reader)
@@ -103,7 +103,7 @@ with open("movies_crew_data.csv", encoding="cp1250") as f:
             row[:2] + row[3:]
         )
 
-conn.commit()
 
+conn.commit()
 cur.close()
 conn.close()

@@ -6,6 +6,7 @@ from controllers import Login, Main, Admin, Movie
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.title("Movie Database")
         self.current_user_id = None
         self.show_login()
 
