@@ -242,6 +242,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 create or replace function delete_rating(u_id INTEGER, m_id INTEGER) returns TEXT as $$
+declare
+	a_id INTEGER;
 begin
 	select action_id into a_id from actions natural join ratings where user_id = u_id and movie_id = m_id;
 	if a_id is not null then
@@ -386,6 +388,7 @@ CREATE TRIGGER trigger_prevent_duplicate_watched_film
 BEFORE INSERT ON actions
 FOR EACH ROW
 EXECUTE FUNCTION prevent_duplicate_watched_film();
+
 
 
 
