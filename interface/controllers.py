@@ -401,7 +401,7 @@ class Movie:
     def show_reviews(self):
         revs = show_movie_review(self.movie_id)
         for r in revs:
-            s = f'   --- \n Nick: {r[1]} \n Rating: {r[2]} \n Review: {r[3]}) \n    --- \n'
+            s = f'   --- \n Nick: {r[1]} \n Rating: {r[2]} \n Review: {r[3]} \n   --- \n'
             self.view.reviews.insert(tk.END, s)
         self.view.reviews.pack()
 

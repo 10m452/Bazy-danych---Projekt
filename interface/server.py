@@ -4,8 +4,8 @@ def get_conn():
     return psycopg2.connect(**DB_CONFIG)
 
 DB_CONFIG = {
-    "host" : "localhost",
-    "database" : "movie_database",
+    "host" : "***",
+    "database" : "***",
     "user" : "***",
     "password" : "***",
     "port": 5432

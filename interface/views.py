@@ -162,7 +162,7 @@ class MovieView(tk.Frame):
         self.movie_length = tk.Label(self,text="", font=("Arial", 12, "bold"))
         self.movie_length.pack(pady=10)
 
-        self.movie_description = tk.Label(self,text="", font=("Arial", 12, "bold"), wraplength=400, justify="left")
+        self.movie_description = tk.Label(self,text="", font=("Arial", 12, "bold"), wraplength=500, justify="left")
         self.movie_description.pack(pady=10)
 
         self.movie_average = tk.Label(self, text="", font=("Arial", 12, "bold"), wraplength=400, justify="left")
