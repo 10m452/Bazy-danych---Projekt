@@ -6,9 +6,9 @@ import psycopg2
 conn = psycopg2.connect(
     host="localhost",
     port=5432,
-    database="movie_database", # baza
-    user="postgres",
-    password="Natalka" # haslo
+    database="***", # baza
+    user="***",
+    password="***" # haslo
 )
 
 cur = conn.cursor()
