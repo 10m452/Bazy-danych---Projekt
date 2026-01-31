@@ -5,7 +5,7 @@ def get_conn():
 
 DB_CONFIG = {
     "host" : "localhost",
-    "database" : "***",
+    "database" : "movie_database",
     "user" : "***",
     "password" : "***",
     "port": 5432

@@ -13,7 +13,7 @@ class LoginFrame(tk.Frame):
 
         tk.Label(self, text="Hi! Welcome to Our Movie Data Base.").pack()
 
-        login = tk.Label(self, text="Please enter your login (don't use any special symbols \n capital letters do not matter!): ")
+        login = tk.Label(self, text="Please enter your login: ")
         login.pack()
 
         self.nick_entr = tk.Entry(self, width=50)
@@ -21,7 +21,7 @@ class LoginFrame(tk.Frame):
 
         pswrd = tk.Label(self, text = "Please enter your password: ")
         pswrd.pack()
-        self.pswrd_entr= tk.Entry(self, width = 50)
+        self.pswrd_entr= tk.Entry(self, width = 50, show="*")
         self.pswrd_entr.pack()
 
         self.login_btn = tk.Button(self, text="Login")

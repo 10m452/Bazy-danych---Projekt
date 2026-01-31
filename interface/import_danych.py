@@ -2,14 +2,13 @@ import csv
 import psycopg2
 
 
-
 # połączenie z bazą
 conn = psycopg2.connect(
     host="localhost",
     port=5432,
-    database="***", # baza
-    user="***",
-    password="***" # haslo
+    database="movie_database", # baza
+    user="postgres",
+    password="Natalka" # haslo
 )
 
 cur = conn.cursor()
